@@ -7,7 +7,7 @@ import neuralfoil as nf
 delta_range = np.linspace(-0.10, 0.10, 21)
 
 #integer angle of attack values
-alpha_range = np.linspace(0.0, 12.0, 13)
+alpha_range = np.linspace(0, 12, 13)
 
 # flight parameters (c = 1.0 m)
 Re = 6.87e5
@@ -72,7 +72,6 @@ def generate_morphed_naca4412(delta, x_h=0.70, n_points=2000):
     y_coords = np.concatenate([yu[::-1], yl[1:]])
     return np.column_stack((x_coords, y_coords))
 
-# prepare an empty matrix
 Cl_matrix = np.zeros((len(delta_range), len(alpha_range)))
 Cd_matrix = np.zeros((len(delta_range), len(alpha_range)))
 
@@ -87,18 +86,18 @@ for i, delta in enumerate(delta_range):
             alpha=float(alpha),
             Re=Re
         )
-# extract scalar values        
-        Cl_matrix[i, j] = float(np.squeeze(aero['CL']))
-        Cd_matrix[i, j] = float(np.squeeze(aero['CD']))
 
-col_names = [f"alpha_{a}deg" for a in alpha_range]
+for i in range(0,20): 
+    coords = generate_morphed_naca4412(delta=delta, x_h=0.70, n_points=200) # use 200 points for XFOIL simulations
+    airfoil = asb.Airfol(name=f"morphed_d{delta:.2f}", coordinates = coords)
 
-df_Cl = pd.DataFrame(Cl_matrix, index=delta_range, columns=col_names)
-df_Cl.index.name = "delta"
-df_Cl.to_csv("Cl_lookup_table.csv")
+    xf = asb.XFoil(
+        airfoil=airfoil,
+        Re=Re,
+        mach = mach, # incompressible flow conditions
+        max_iter = 100, 
+        verbose=False
+    )
 
-df_Cd = pd.DataFrame(Cd_matrix, index=delta_range, columns=col_names)
-df_Cd.index.name = "delta"
-df_Cd.to_csv("Cd_lookup_table.csv")
-
-print("files 'Cl_lookup_table.csv' and 'Cd_lookup_table.csv' generated successfully.")
+# evaluate across all AoA's
+    results = xf.alpha(alpha_range)
