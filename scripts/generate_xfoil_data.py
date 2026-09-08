@@ -1,7 +1,7 @@
 import numpy as np 
 import pandas as pd 
 import aerosandbox as asb
-import neuralfoil as nf 
+import os
 
 # 21 evenly spaced deflection values from -0.10 to 0.10 
 delta_range = np.linspace(-0.10, 0.10, 21)
@@ -72,32 +72,62 @@ def generate_morphed_naca4412(delta, x_h=0.70, n_points=2000):
     y_coords = np.concatenate([yu[::-1], yl[1:]])
     return np.column_stack((x_coords, y_coords))
 
-Cl_matrix = np.zeros((len(delta_range), len(alpha_range)))
-Cd_matrix = np.zeros((len(delta_range), len(alpha_range)))
+# allocate storage for Cl and Cd matrices beforehand
+Cl_xfoil = np.full((len(delta_range), len(alpha_range)), np.nan)
+Cd_xfoil = np.full((len(delta_range), len(alpha_range)), np.nan)
 
-# run NeuralFoil
-for i, delta in enumerate(delta_range):
-    coords = generate_morphed_naca4412(delta=delta, x_h=0.70)
-    airfoil = asb.Airfoil(name=f"morphed_delta_{delta}", coordinates=coords)
-    
-    for j, alpha in enumerate(alpha_range):
-        aero = nf.get_aero_from_airfoil(
-            airfoil=airfoil,
-            alpha=float(alpha),
-            Re=Re
-        )
+print(f"starting XFOIL batch run across {len(delta_range) * len(alpha_range)} conditons...")
 
-for i in range(0,20): 
+# enumerate through all 21 deflections
+for i, delta in enumerate(delta_range): 
+    delta = delta_range[i]
     coords = generate_morphed_naca4412(delta=delta, x_h=0.70, n_points=200) # use 200 points for XFOIL simulations
-    airfoil = asb.Airfol(name=f"morphed_d{delta:.2f}", coordinates = coords)
+    airfoil = asb.Airfoil(name=f"morphed_d{delta:.2f}", coordinates = coords)
 
     xf = asb.XFoil(
         airfoil=airfoil,
         Re=Re,
         mach = mach, # incompressible flow conditions
         max_iter = 100, 
+        xfoil_command = "bin/xfoil.exe",
         verbose=False
     )
 
-# evaluate across all AoA's
-    results = xf.alpha(alpha_range)
+    # evaluate across all AoA's
+    results = xf.alpha(alpha_range) 
+
+    # verify that XFOIL returned data 
+    if "alpha" in results and len(results["alpha"]) > 0: 
+    # all these "converged" values are values that weren't possibly omitted from flow seperation/stall effects
+        converged_cls = results["CL"]
+        converged_cds = results["CD"]
+        converged_alphas = results["alpha"]
+
+    # loop through each converged alpha value 
+        for k in range(len(results["alpha"])): 
+            a = converged_alphas[k]
+    # returns the columnn number where the angle belongs
+            matching_cols = np.where(np.isclose(alpha_range, a, atol=1e-2))[0]
+
+            if len(matching_cols) > 0: 
+                col_id = matching_cols[0]
+            # place the solved value into row i and column col_id
+                Cl_xfoil[i, col_id] = converged_cls[k]
+                Cd_xfoil[i, col_id] = converged_cds[k]
+
+    converged_count = np.sum(~np.isnan(Cl_xfoil[i, :]))
+    print(f"Ccmpleted delta = {delta:+.2f} m | converged: {converged_count}/{len(alpha_range)}")
+
+# export results to CSV
+os.makedirs("data", exist_ok=True)
+col_names = [f"alpha_{int(a)}deg" for a in alpha_range]
+
+df_cl = pd.DataFrame(Cl_xfoil, index=np.round(delta_range, 2), columns=col_names)
+df_cl.index.name = "delta"
+df_cl.to_csv("data/Cl_xfoil.csv")
+
+df_cd = pd.DataFrame(Cd_xfoil, index=np.round(delta_range, 2), columns=col_names)
+df_cd.index.name = "delta"
+df_cd.to_csv("data/Cd_xfoil.csv")
+
+print("Saved 'data/Cl_xfoil.csv' and 'data/Cd_xfoil.csv' successfully.")
