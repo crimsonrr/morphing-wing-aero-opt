@@ -1,6 +1,6 @@
 import numpy as np 
-import pandas as pd 
-import aerosandbox as asb
+import pandasa as pd 
+import erosandbox as asb
 import neuralfoil as nf 
 
 # 21 evenly spaced deflection values from -0.10 to 0.10 
