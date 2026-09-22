@@ -71,7 +71,7 @@ for d, col, lbl in zip(cases, colors, labels):
     )
 
 # Formatting Left Plot: Cl vs Alpha
-ax1.set_title("Lift Curve Comparison", fontsize=12, fontweight="bold")
+ax1.set_title("Cl v Alpha", fontsize=12, fontweight="bold")
 ax1.set_xlabel(r"Angle of Attack $\alpha$ (deg)", fontsize=11)
 ax1.set_ylabel(r"Section Lift Coefficient $C_l$", fontsize=11)
 ax1.grid(True, linestyle=":", alpha=0.6)
@@ -79,7 +79,7 @@ ax1.set_xlim([0, 12])
 ax1.legend(fontsize=8, loc="upper left")
 
 # Formatting Right Plot: Drag Polar (Cl vs Cd)
-ax2.set_title("Drag Polar Comparison", fontsize=12, fontweight="bold")
+ax2.set_title("Cl v Cd", fontsize=12, fontweight="bold")
 ax2.set_xlabel(r"Section Drag Coefficient $C_d$", fontsize=11)
 ax2.set_ylabel(r"Section Lift Coefficient $C_l$", fontsize=11)
 ax2.grid(True, linestyle=":", alpha=0.6)
