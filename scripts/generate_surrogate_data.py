@@ -1,13 +1,13 @@
 import numpy as np 
-import pandasa as pd 
-import erosandbox as asb
+import pandas as pd 
+import aerosandbox as asb
 import neuralfoil as nf 
 
 # 21 evenly spaced deflection values from -0.10 to 0.10 
 delta_range = np.linspace(-0.10, 0.10, 21)
 
 #integer angle of attack values
-alpha_range = np.linspace(0.0, 12.0, 13)
+alpha_range = np.linspace(-20.0, 20.0, 41)
 
 # flight parameters (c = 1.0 m)
 Re = 6.87e5
@@ -95,10 +95,10 @@ col_names = [f"alpha_{a}deg" for a in alpha_range]
 
 df_Cl = pd.DataFrame(Cl_matrix, index=delta_range, columns=col_names)
 df_Cl.index.name = "delta"
-df_Cl.to_csv("Cl_lookup_table.csv")
+df_Cl.to_csv("data/Cl_lookup_table.csv")
 
 df_Cd = pd.DataFrame(Cd_matrix, index=delta_range, columns=col_names)
 df_Cd.index.name = "delta"
-df_Cd.to_csv("Cd_lookup_table.csv")
+df_Cd.to_csv("data/Cd_lookup_table.csv")
 
 print("files 'Cl_lookup_table.csv' and 'Cd_lookup_table.csv' generated successfully.")

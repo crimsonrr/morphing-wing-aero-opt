@@ -7,7 +7,7 @@ import os
 delta_range = np.linspace(-0.10, 0.10, 21)
 
 #integer angle of attack values
-alpha_range = np.linspace(0, 12, 13)
+alpha_range = np.linspace(-20.0, 20.0, 41)
 
 # flight parameters (c = 1.0 m)
 Re = 6.87e5
@@ -116,11 +116,11 @@ for i, delta in enumerate(delta_range):
                 Cd_xfoil[i, col_id] = converged_cds[k]
 
     converged_count = np.sum(~np.isnan(Cl_xfoil[i, :]))
-    print(f"Ccmpleted delta = {delta:+.2f} m | converged: {converged_count}/{len(alpha_range)}")
+    print(f"Completed delta = {delta:+.2f} m | converged: {converged_count}/{len(alpha_range)}")
 
 # export results to CSV
 os.makedirs("data", exist_ok=True)
-col_names = [f"alpha_{int(a)}deg" for a in alpha_range]
+col_names = [f"alpha_{int(round(a))}deg" for a in alpha_range]
 
 df_cl = pd.DataFrame(Cl_xfoil, index=np.round(delta_range, 2), columns=col_names)
 df_cl.index.name = "delta"
