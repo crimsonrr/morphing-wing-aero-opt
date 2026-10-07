@@ -85,7 +85,7 @@ for d, col in zip(cases, colors):
         )
 
 # Left Subplot: Cl vs Alpha
-ax1.set_title(r"Lift Polar: Continuous Morphing vs. Hinged Flap ($\pm 20^\circ$)", fontsize=11, fontweight="bold")
+ax1.set_title(r"Cl vs Alpha: Continuous Morphing vs. Hinged Flap ($\pm 20^\circ$)", fontsize=11, fontweight="bold")
 ax1.set_xlabel(r"Angle of Attack $\alpha$ (deg)", fontsize=10)
 ax1.set_ylabel(r"Section Lift Coefficient $C_l$", fontsize=10)
 ax1.grid(True, linestyle=":", alpha=0.6)
@@ -96,7 +96,7 @@ ax1.axvline(0, color="black", linestyle="-", linewidth=0.6, alpha=0.5)
 ax1.legend(fontsize=8, loc="upper left")
 
 # Right Subplot: Cl vs Cd (Drag Polar & Drag Bucket)
-ax2.set_title("Drag Polar: Boundary Layer Health & Profile Drag Bucket", fontsize=11, fontweight="bold")
+ax2.set_title("Cl vs Cd: Continuous Morphing vs. Hinged Flap", fontsize=11, fontweight="bold")
 ax2.set_xlabel(r"Section Drag Coefficient $C_d$", fontsize=10)
 ax2.set_ylabel(r"Section Lift Coefficient $C_l$", fontsize=10)
 ax2.grid(True, linestyle=":", alpha=0.6)
