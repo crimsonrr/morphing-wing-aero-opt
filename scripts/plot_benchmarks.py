@@ -3,8 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+matplotlib.use("Agg")
 
 # Load datasets
 cl_nf = pd.read_csv("data/Cl_lookup_table.csv", index_col=0)
