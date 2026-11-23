@@ -9,7 +9,7 @@ delta_range = np.linspace(-0.10, 0.10, 21)
 #integer angle of attack values
 alpha_range = np.linspace(-20.0, 20.0, 41)
 
-# flight parameters (c = 1.0 m)
+# flight parameters (c = 1.0 m) 
 Re = 6.87e5
 mach = 0.03
 
